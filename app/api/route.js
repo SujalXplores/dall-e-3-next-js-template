@@ -1,7 +1,19 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
 
 export async function POST(request) {
+  const session = await getServerSession();
+
+  if (!session) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
   try {
     const body = await request.json();
     const { prompt, quality, style, size } = body;
@@ -10,9 +22,9 @@ export async function POST(request) {
     const image = await openai.images.generate({
       model: "dall-e-3",
       n: 1,
-      quality: quality || "hd", // default to "standard" if not provided
-      style: style || "vivid", // default to "natural" if not provided
-      size: size || "1024x1024", // default to "1024x1024" if not provided
+      quality: quality || "hd",
+      style: style || "vivid",
+      size: size || "1024x1024",
       prompt: prompt,
     });
 
