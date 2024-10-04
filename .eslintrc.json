@@ -1,3 +1,69 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": ["next/core-web-vitals", "airbnb", "airbnb/hooks"],
+  "settings": {
+    "import/resolver": {
+      "alias": {
+        "map": [["@", "./"]],
+        "extensions": [".js", ".jsx"]
+      },
+      "node": {
+        "extensions": [".js", ".jsx"]
+      }
+    }
+  },
+  "rules": {
+    "class-methods-use-this": "off",
+    "no-param-reassign": "off",
+    "no-constant-binary-expression": "error",
+    "no-duplicate-imports": "error",
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }],
+    "brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
+    "max-len": "off",
+    "no-nested-ternary": "off",
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+    "react/function-component-definition": [
+      "error",
+      {
+        "namedComponents": "arrow-function",
+        "unnamedComponents": "arrow-function"
+      }
+    ],
+    "react/hook-use-state": "error",
+    "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
+    "react/jsx-no-leaked-render": "error",
+    "react/jsx-sort-default-props": "off",
+    "react/jsx-sort-props": [
+      "error",
+      {
+        "callbacksLast": true,
+        "shorthandFirst": false,
+        "shorthandLast": true,
+        "multiline": "last",
+        "ignoreCase": true,
+        "noSortAlphabetically": false
+      }
+    ],
+    "react/prop-types": "off",
+    "react/sort-prop-types": "off",
+    "react/jsx-props-no-spreading": "off",
+    "default-param-last": "error",
+    "import/extensions": ["error", "ignorePackages", {
+      "js": "never",
+      "jsx": "never",
+      "ts": "never",
+      "tsx": "never"
+    }],
+    "no-shadow": "off",
+    "no-console": "warn",
+    "react/jsx-no-bind": ["error", {
+      "allowArrowFunctions": true,
+      "allowFunctions": false,
+      "allowBind": false
+    }],
+    "react/no-array-index-key": "warn",
+    "jsx-a11y/heading-has-content": "off",
+    "import/prefer-default-export": "off",
+    "import/exports-last": "off",
+    "react/react-in-jsx-scope": "off"
+  }
 }

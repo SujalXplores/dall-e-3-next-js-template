@@ -1,28 +1,37 @@
-"use client";
+'use client';
 
-import { useState, useRef } from "react";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ImageIcon, Download, Trash2, Loader2, Clipboard } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { imagePlaceholder } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { motion } from "framer-motion";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { User, LogOut } from "lucide-react"; // Add these icons
+import { useRef, useState } from 'react';
+import Image from 'next/image';
+import {
+  Download, ImageIcon, Loader2, Lock, LogOut,
+  Trash2,
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { signIn, signOut, useSession } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Tabs, TabsContent, TabsList, TabsTrigger,
+} from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { imagePlaceholder } from '@/lib/utils';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const MAX_CHAR_COUNT = 1000;
-export default function Home() {
+
+const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [imageUrls, setImageUrls] = useState(() => {
@@ -32,83 +41,68 @@ export default function Home() {
     }
     return [];
   });
-  const [activeTab, setActiveTab] = useState("create");
+  const [activeTab, setActiveTab] = useState('create');
   const [textareaValue, setTextareaValue] = useState('');
 
-  // Function to save images to local storage
   const saveImagesToLocalStorage = (images) => {
     localStorage.setItem('generatedImages', JSON.stringify(images));
   };
 
   const textareaRef = useRef(null);
 
-  const handlePaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      if (textareaRef.current) {
-        const start = textareaRef.current.selectionStart;
-        const end = textareaRef.current.selectionEnd;
-        const currentValue = textareaRef.current.value;
-        const newValue = currentValue.substring(0, start) + text + currentValue.substring(end);
-        setTextareaValue(newValue);
-        textareaRef.current.setSelectionRange(start + text.length, start + text.length);
-        textareaRef.current.focus();
-      }
-    } catch (err) {
-      console.error('Failed to read clipboard contents: ', err);
-    }
-  };
-
-  function handleDeleteImage(index) {
-    const newImageUrls = imageUrls.filter((_, i) => i !== index);
+  const handleDeleteImage = (imageUrl) => {
+    const newImageUrls = imageUrls.filter((url) => url !== imageUrl);
     setImageUrls(newImageUrls);
     saveImagesToLocalStorage(newImageUrls);
-  }
+  };
 
-  function handleDeleteAllImages() {
+  const handleDeleteAllImages = () => {
     setImageUrls([]);
     saveImagesToLocalStorage([]);
-  }
+  };
 
-  async function onSubmit(event) {
+  const onSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
 
     const formData = new FormData(event.currentTarget);
-    const prompt = formData.get("prompt");
-    const quality = formData.get("quality");
-    const style = formData.get("style");
-    const size = formData.get("size");
+    const prompt = formData.get('prompt');
+    const quality = formData.get('quality');
+    const style = formData.get('style');
+    const size = formData.get('size');
 
     try {
-      const response = await fetch("/api/", {
-        method: "POST",
+      const response = await fetch('/api/', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt, quality, style, size }),
+        body: JSON.stringify({
+          prompt, quality, style, size,
+        }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        const errorMessage =
-          errorData.error || `HTTP error! status: ${response.status}`;
+        const errorMessage = errorData.error || `HTTP error! status: ${response.status}`;
         setError(errorMessage);
-      } else {
+      }
+      else {
         const data = await response.json();
         const newImageUrls = [data.image, ...imageUrls];
         setImageUrls(newImageUrls);
         saveImagesToLocalStorage(newImageUrls);
-        setActiveTab("gallery");
+        setActiveTab('gallery');
       }
-    } catch (error) {
-      console.error(error);
-      setError("Unknown error!");
-    } finally {
+    }
+    catch (_error) {
+      setError('Unknown error!');
+    }
+    finally {
       setIsLoading(false);
     }
-  }
+  };
 
   const handlePromptChange = (event) => {
     const text = event.target.value.slice(0, MAX_CHAR_COUNT);
@@ -117,7 +111,7 @@ export default function Home() {
 
   const fadeIn = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.5 } }
+    visible: { opacity: 1, transition: { duration: 0.5 } },
   };
 
   const staggerChildren = {
@@ -125,9 +119,9 @@ export default function Home() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const { data: session } = useSession();
@@ -135,19 +129,23 @@ export default function Home() {
   if (!session) {
     return (
       <motion.main
-        initial="hidden"
         animate="visible"
-        variants={fadeIn}
         className="container mx-auto px-4 py-8 min-h-screen flex flex-col items-center justify-center"
+        initial="hidden"
+        variants={fadeIn}
       >
         <motion.div
-          variants={fadeIn}
           className="text-center space-y-6 max-w-md"
+          variants={fadeIn}
         >
-          <h1 className="text-4xl font-bold">AI <span className="animated-gradient-text">Artistry Studio</span></h1>
+          <h1 className="text-4xl font-bold">
+            AI
+            {' '}
+            <span className="animated-gradient-text">Artistry Studio</span>
+          </h1>
           <p className="text-xl text-muted-foreground">Unleash your creativity with AI-powered image generation</p>
-          <Button onClick={() => signIn("google")} size="lg" className="mt-4">
-            <ImageIcon className="mr-2 h-5 w-5" />
+          <Button className="mt-4 rounded-full" size="lg" onClick={() => signIn('google')}>
+            <Lock className="mr-2 h-5 w-5" />
             Sign In with Google
           </Button>
         </motion.div>
@@ -157,27 +155,31 @@ export default function Home() {
 
   return (
     <motion.main
-      initial="hidden"
       animate="visible"
-      variants={fadeIn}
       className="container mx-auto px-4 py-8 min-h-screen"
+      initial="hidden"
+      variants={fadeIn}
     >
       <motion.header
-        variants={fadeIn}
         className="flex justify-between items-center py-6 mb-8"
+        variants={fadeIn}
       >
-        <h1 className="text-3xl font-bold">AI <span className="animated-gradient-text">Artistry Studio</span></h1>
-        {session && (
+        <h1 className="text-3xl font-bold">
+          AI
+          {' '}
+          <span className="animated-gradient-text">Artistry Studio</span>
+        </h1>
+        {session ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+              <Button className="relative h-8 w-8 rounded-full" variant="ghost">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={session.user.image} alt={session.user.name} />
+                  <AvatarImage alt={session.user.name} src={session.user.image} />
                   <AvatarFallback>{session.user.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuContent align="end" className="w-56" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{session.user.name}</p>
@@ -191,10 +193,10 @@ export default function Home() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )}
+        ) : null}
       </motion.header>
 
-      <Tabs defaultValue="create" className="space-y-8" value={activeTab} onValueChange={setActiveTab}>
+      <Tabs className="space-y-8" defaultValue="create" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="create">Create Masterpiece</TabsTrigger>
           <TabsTrigger value="gallery">Your Gallery</TabsTrigger>
@@ -205,53 +207,39 @@ export default function Home() {
             <Card>
               <CardContent className="pt-6">
                 <h2 className="text-2xl font-semibold mb-6">Craft Your Masterpiece</h2>
-                {error && (
-                  <Alert variant="destructive" className="mb-6">
+                {error ? (
+                  <Alert className="mb-6" variant="destructive">
                     <AlertTitle>Error</AlertTitle>
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
-                )}
-                <form noValidate onSubmit={onSubmit} className="space-y-6">
+                ) : null}
+                <form className="space-y-6" noValidate onSubmit={onSubmit}>
                   <div className="space-y-2">
                     <Label htmlFor="prompt">Describe your vision:</Label>
-                    <div className="relative">
-                      <Textarea
-                        ref={textareaRef}
-                        name="prompt"
-                        rows={6}
-                        placeholder="Paint a picture with words - the more detailed, the better!"
-                        required
-                        onChange={handlePromptChange}
-                        maxLength={MAX_CHAR_COUNT}
-                      />
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              className="absolute right-2 top-2"
-                              onClick={handlePaste}
-                            >
-                              <Clipboard className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Paste from clipboard</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
+                    <Textarea
+                      maxLength={MAX_CHAR_COUNT}
+                      name="prompt"
+                      placeholder="Paint a picture with words - the more detailed, the better!"
+                      ref={textareaRef}
+                      rows={6}
+                      required
+                      onChange={handlePromptChange}
+                    />
                     <p className="text-sm text-muted-foreground flex justify-between">
                       <span>Let your imagination run wild. The more specific you are, the more amazing the result!</span>
-                      <span>{textareaValue.length} / {MAX_CHAR_COUNT}</span>
+                      <span>
+                        {textareaValue.length}
+                        {' '}
+                        /
+                        {' '}
+                        {MAX_CHAR_COUNT}
+                      </span>
                     </p>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="quality">Quality:</Label>
-                      <Select name="quality" defaultValue="hd" required>
+                      <Select defaultValue="hd" name="quality" required>
                         <SelectTrigger>
                           <SelectValue placeholder="Select quality" />
                         </SelectTrigger>
@@ -263,7 +251,7 @@ export default function Home() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="style">Style:</Label>
-                      <Select name="style" defaultValue="vivid" required>
+                      <Select defaultValue="vivid" name="style" required>
                         <SelectTrigger>
                           <SelectValue placeholder="Select style" />
                         </SelectTrigger>
@@ -275,7 +263,7 @@ export default function Home() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="size">Size:</Label>
-                      <Select name="size" defaultValue="1024x1024" required>
+                      <Select defaultValue="1024x1024" name="size" required>
                         <SelectTrigger>
                           <SelectValue placeholder="Select size" />
                         </SelectTrigger>
@@ -287,7 +275,7 @@ export default function Home() {
                       </Select>
                     </div>
                   </div>
-                  <Button disabled={isLoading} type="submit" className="w-full">
+                  <Button className="w-full" disabled={isLoading} type="submit">
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -329,7 +317,9 @@ export default function Home() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={handleDeleteAllImages}>Continue</AlertDialogAction>
+                          <AlertDialogAction onClick={handleDeleteAllImages}>
+                            Continue
+                          </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
@@ -337,36 +327,40 @@ export default function Home() {
                 </div>
                 <ScrollArea className="h-[600px] pr-4">
                   <motion.div
-                    variants={staggerChildren}
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                    variants={staggerChildren}
                   >
-                    {imageUrls.map((imageUrl, index) => (
-                      <motion.div key={index} variants={fadeIn}>
+                    {imageUrls.map((imageUrl) => (
+                      <motion.div key={imageUrl} variants={fadeIn}>
                         <Card className="overflow-hidden">
                           <CardContent className="p-0">
                             <div className="relative aspect-square">
                               <Image
-                                fill
-                                src={imageUrl}
                                 alt="Generated Image"
                                 className="object-cover"
                                 placeholder={imagePlaceholder({ width: 512, height: 512 })}
+                                src={imageUrl}
+                                fill
                               />
                             </div>
                           </CardContent>
                           <CardFooter className="flex flex-col sm:flex-row justify-between p-4 space-y-2 sm:space-y-0">
-                            <Button asChild variant="outline" className="w-full sm:w-auto">
+                            <Button className="w-full sm:w-auto" variant="outline" asChild>
                               <a
+                                download={`generated-image-${imageUrl.split('/').pop()}`}
                                 href={imageUrl}
-                                download={`generated-image-${index}.jpg`}
-                                target="_blank"
                                 rel="noopener noreferrer"
+                                target="_blank"
                               >
                                 <Download className="mr-2 h-4 w-4" />
                                 Download
                               </a>
                             </Button>
-                            <Button variant="ghost" onClick={() => handleDeleteImage(index)} className="w-full sm:w-auto text-red-500">
+                            <Button
+                              className="w-full sm:w-auto text-red-500"
+                              variant="ghost"
+                              onClick={() => handleDeleteImage(imageUrl)}
+                            >
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete
                             </Button>
@@ -377,11 +371,13 @@ export default function Home() {
 
                     {imageUrls.length === 0 && (
                       <motion.div
-                        variants={fadeIn}
                         className="col-span-full flex flex-col items-center justify-center h-[400px] text-center"
+                        variants={fadeIn}
                       >
                         <ImageIcon className="h-16 w-16 text-muted-foreground mb-4" />
-                        <p className="text-xl font-semibold text-muted-foreground">Your Gallery Awaits</p>
+                        <p className="text-xl font-semibold text-muted-foreground">
+                          Your Gallery Awaits
+                        </p>
                         <p className="mt-2 text-sm text-muted-foreground max-w-md">
                           Create your first masterpiece and watch your collection grow
                         </p>
@@ -396,4 +392,6 @@ export default function Home() {
       </Tabs>
     </motion.main>
   );
-}
+};
+
+export default Home;
