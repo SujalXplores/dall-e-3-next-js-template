@@ -3,11 +3,10 @@
 import { useRef, useState } from 'react';
 import Image from 'next/image';
 import {
-  Download, ImageIcon, Loader2, Lock, LogOut,
+  Download, ImageIcon, Loader2,
   Trash2,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { signIn, signOut, useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -24,10 +23,7 @@ import { imagePlaceholder } from '@/lib/utils';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { SignedIn, UserButton } from '@clerk/nextjs';
 
 const MAX_CHAR_COUNT = 1000;
 
@@ -124,35 +120,6 @@ const Home = () => {
     },
   };
 
-  const { data: session } = useSession();
-
-  if (!session) {
-    return (
-      <motion.main
-        animate="visible"
-        className="container mx-auto px-4 py-8 min-h-screen flex flex-col items-center justify-center"
-        initial="hidden"
-        variants={fadeIn}
-      >
-        <motion.div
-          className="text-center space-y-6 max-w-md"
-          variants={fadeIn}
-        >
-          <h1 className="text-4xl font-bold">
-            AI
-            {' '}
-            <span className="animated-gradient-text">Artistry Studio</span>
-          </h1>
-          <p className="text-xl text-muted-foreground">Unleash your creativity with AI-powered image generation</p>
-          <Button className="mt-4 rounded-full" size="lg" onClick={() => signIn('google')}>
-            <Lock className="mr-2 h-5 w-5" />
-            Sign In with Google
-          </Button>
-        </motion.div>
-      </motion.main>
-    );
-  }
-
   return (
     <motion.main
       animate="visible"
@@ -169,31 +136,9 @@ const Home = () => {
           {' '}
           <span className="animated-gradient-text">Artistry Studio</span>
         </h1>
-        {session ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="relative h-8 w-8 rounded-full" variant="ghost">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage alt={session.user.name} src={session.user.image} />
-                  <AvatarFallback>{session.user.name?.charAt(0)}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{session.user.name}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{session.user.email}</p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut()}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : null}
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
       </motion.header>
 
       <Tabs className="space-y-8" defaultValue="create" value={activeTab} onValueChange={setActiveTab}>

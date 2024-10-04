@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   font-family: "Open Sans", sans-serif;
 }
@@ -72,7 +77,14 @@ body {
 }
 
 .animated-gradient-text {
-  background: linear-gradient(300deg, #ff6b6b, #4ecdc4, #45aaf2, #a55eea, #fed330);
+  background: linear-gradient(
+    300deg,
+    #ff6b6b,
+    #4ecdc4,
+    #45aaf2,
+    #a55eea,
+    #fed330
+  );
   background-size: 300% 300%;
   animation: gradient-shift 15s ease infinite;
   -webkit-background-clip: text;
@@ -92,4 +104,3 @@ body {
     background-position: 0% 50%;
   }
 }
-

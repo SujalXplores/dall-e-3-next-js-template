@@ -1,21 +1,19 @@
 import { Inter } from 'next/font/google';
-import { getServerSession } from 'next-auth/next';
-import SessionProvider from '@/components/session-provider';
+import { ClerkProvider } from '@clerk/nextjs';
 
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
-const RootLayout = async ({ children }) => {
-  const session = await getServerSession();
-  return (
+const RootLayout = async ({ children }) => (
+  <ClerkProvider>
     <html lang="en">
-      <SessionProvider session={session}>
-        <body className={inter.className}>{children}</body>
-      </SessionProvider>
+      <body className={inter.className}>
+        {children}
+      </body>
     </html>
-  );
-};
+  </ClerkProvider>
+);
 
 export const metadata = {
   title: 'AI Artistry | Dall-E 3 Image Generator',

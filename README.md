@@ -1,7 +1,7 @@
-# 🎨 DALL-E 3 Image Generator
+# 🎨 AI Artistry Studio
 
 <p align="center">
-  <img src="banner.png" alt="DALL-E 3 Image Generator Logo" width="200"/>
+  <img src="banner.png" alt="AI Artistry Studio Logo" width="200"/>
 </p>
 
 <p align="center">
@@ -24,8 +24,9 @@
 - 🖼️ Generate stunning images using DALL-E 3
 - ⚡ Built with Next.js for lightning-fast performance
 - 🎨 Customizable UI with Tailwind CSS
-- 🔒 Secure API key management
+- 🔒 Secure authentication with Clerk
 - 📱 Responsive design for all devices
+- 🔄 Animated UI elements with Framer Motion
 
 ## 🛠️ Tech Stack
 
@@ -34,6 +35,8 @@
 - [OpenAI API](https://openai.com/blog/openai-api)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Radix UI](https://www.radix-ui.com/)
+- [Clerk](https://clerk.dev/)
+- [Framer Motion](https://www.framer.com/motion/)
 
 ## 🏁 Getting Started
 
@@ -42,6 +45,7 @@
 - Node.js (LTS version)
 - Package manager (npm, yarn, pnpm, or bun)
 - OpenAI API key
+- Clerk account and API keys
 
 ### Quick Start
 
@@ -62,9 +66,11 @@
    ```sh
    cp .env.example .env.local
    ```
-   Then edit `.env.local` and add your OpenAI API key:
+   Then edit `.env.local` and add your OpenAI API key and Clerk API keys:
    ```sh
    OPENAI_API_KEY="sk-your-api-key-here"
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your-clerk-publishable-key"
+   CLERK_SECRET_KEY="your-clerk-secret-key"
    ```
 
 4. Run the development server
@@ -75,6 +81,15 @@
    ```
 
 5. Open [http://localhost:3000](http://localhost:3000) and start creating!
+
+## 🖥️ Usage
+
+1. Sign in using Clerk authentication.
+2. Navigate to the "Create Masterpiece" tab.
+3. Enter your image description in the textarea.
+4. Select quality, style, and size options.
+5. Click "Generate Image" to create your AI-powered artwork.
+6. View and manage your generated images in the "Your Gallery" tab.
 
 ## 🤝 Contributing
 
@@ -92,6 +107,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 - OpenAI for the incredible DALL-E 3 model
 - The Next.js team for their amazing framework
+- Clerk for secure authentication
 - All our [contributors](https://github.com/SujalShah3234/dall-e-3-next-js-template/graphs/contributors) who make this project better every day
 
 ## 🌟 Show your support

@@ -1,19 +1,7 @@
 import OpenAI from 'openai';
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
 
 const POST = async (request) => {
-  const session = await getServerSession();
-
-  if (!session) {
-    return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  }
-
   try {
     const body = await request.json();
     const {
